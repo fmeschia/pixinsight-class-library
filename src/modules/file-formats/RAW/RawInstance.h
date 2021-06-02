@@ -127,6 +127,7 @@ private:
    int                      m_isoSpeed = 0;
    float                    m_focalLength = 0;
    float                    m_aperture = 0;
+   bool                     m_D5500correction = false;
 
    String ExposureAsText() const;
 
