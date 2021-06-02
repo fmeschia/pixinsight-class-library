@@ -2,11 +2,11 @@
 //    / __ \ / ____// /
 //   / /_/ // /    / /
 //  / ____// /___ / /___   PixInsight Class Library
-// /_/     \____//_____/   PCL 2.4.7
+// /_/     \____//_____/   PCL 2.4.9
 // ----------------------------------------------------------------------------
 // Standard SubframeSelector Process Module Version 1.4.5
 // ----------------------------------------------------------------------------
-// SubframeSelectorParameters.cpp - Released 2020-12-17T15:46:56Z
+// SubframeSelectorParameters.cpp - Released 2021-04-09T19:41:49Z
 // ----------------------------------------------------------------------------
 // This file is part of the standard SubframeSelector PixInsight module.
 //
@@ -58,6 +58,7 @@ namespace pcl
 // ----------------------------------------------------------------------------
 
 SSRoutine*                        TheSSRoutineParameter = nullptr;
+SSNonInteractive*                 TheSSNonInteractiveParameter = nullptr;
 
 SSSubframes*                      TheSSSubframesParameter = nullptr;
 SSSubframeEnabled*                TheSSSubframeEnabledParameter = nullptr;
@@ -186,6 +187,23 @@ IsoString SSRoutine::Tooltip() const
           "<p><strong>Star Detection Preview:</strong> Outputs a Structure Map from "
           "the Star Detector for the first subframe. Useful for tweaking Star Detector parameters.</p>";
 };
+
+// ----------------------------------------------------------------------------
+
+SSNonInteractive::SSNonInteractive( MetaProcess* P ) : MetaBoolean( P )
+{
+   TheSSNonInteractiveParameter = this;
+}
+
+IsoString SSNonInteractive::Id() const
+{
+   return "nonInteractive";
+}
+
+bool SSNonInteractive::DefaultValue() const
+{
+   return false;
+}
 
 // ----------------------------------------------------------------------------
 
@@ -2126,4 +2144,4 @@ double SSMeasurementStarResidualMeanDev::MaximumValue() const
 } // pcl
 
 // ----------------------------------------------------------------------------
-// EOF SubframeSelectorParameters.cpp - Released 2020-12-17T15:46:56Z
+// EOF SubframeSelectorParameters.cpp - Released 2021-04-09T19:41:49Z

@@ -2,15 +2,15 @@
 //    / __ \ / ____// /
 //   / /_/ // /    / /
 //  / ____// /___ / /___   PixInsight Class Library
-// /_/     \____//_____/   PCL 2.4.7
+// /_/     \____//_____/   PCL 2.4.9
 // ----------------------------------------------------------------------------
 // Standard Debayer Process Module Version 1.8.2
 // ----------------------------------------------------------------------------
-// DebayerInstance.h - Released 2020-12-17T15:46:56Z
+// DebayerInstance.h - Released 2021-04-09T19:41:49Z
 // ----------------------------------------------------------------------------
 // This file is part of the standard Debayer PixInsight module.
 //
-// Copyright (c) 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+// Copyright (c) 2003-2021 Pleiades Astrophoto S.L. All Rights Reserved.
 //
 // Redistribution and use in both source and binary forms, with or without
 // modification, is permitted provided that the following conditions are met:
@@ -111,6 +111,7 @@ private:
    pcl_bool   p_showImages;        // optional for view execution only
    String     p_cfaSourceFilePath; // ...
    item_list  p_targets;
+   pcl_bool   p_autoMemoryLimit;
    pcl_bool   p_noGUIMessages; // ### DEPRECATED
 
    // Format hints
@@ -170,7 +171,8 @@ private:
    static FMatrix sRGBConversionMatrixFromTarget( FileFormatInstance& );
    static FMatrix sRGBConversionMatrixFromTargetProperty( const Variant& );
 
-   void EvaluateNoise( FVector& noiseEstimates, FVector& noiseFractions, StringList& noiseAlgorithms, const Image& ) const;
+   void EvaluateNoise( FVector& noiseEstimates, FVector& noiseFractions, StringList& noiseAlgorithms,
+                       const ImageVariant&, const IsoString& cfaPattern ) const;
 
    void ApplyErrorPolicy();
 
@@ -188,4 +190,4 @@ private:
 #endif   // __DebayerInstance_h
 
 // ----------------------------------------------------------------------------
-// EOF DebayerInstance.h - Released 2020-12-17T15:46:56Z
+// EOF DebayerInstance.h - Released 2021-04-09T19:41:49Z

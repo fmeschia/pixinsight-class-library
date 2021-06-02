@@ -2,11 +2,11 @@
 //    / __ \ / ____// /
 //   / /_/ // /    / /
 //  / ____// /___ / /___   PixInsight Class Library
-// /_/     \____//_____/   PCL 2.4.7
+// /_/     \____//_____/   PCL 2.4.9
 // ----------------------------------------------------------------------------
 // Standard SubframeSelector Process Module Version 1.4.5
 // ----------------------------------------------------------------------------
-// SubframeSelectorInstance.cpp - Released 2020-12-17T15:46:56Z
+// SubframeSelectorInstance.cpp - Released 2021-04-09T19:41:49Z
 // ----------------------------------------------------------------------------
 // This file is part of the standard SubframeSelector PixInsight module.
 //
@@ -99,6 +99,7 @@ const float s_5x5B3Spline_kj[] =
 SubframeSelectorInstance::SubframeSelectorInstance( const MetaProcess* m )
    : ProcessImplementation( m )
    , p_routine( SSRoutine::Default )
+   , p_nonInteractive( TheSSNonInteractiveParameter->DefaultValue() )
    , p_fileCache( TheSSFileCacheParameter->DefaultValue() )
    , p_subframeScale( TheSSSubframeScaleParameter->DefaultValue() )
    , p_cameraGain( TheSSCameraGainParameter->DefaultValue() )
@@ -151,6 +152,7 @@ void SubframeSelectorInstance::Assign( const ProcessImplementation& p )
    if ( x != nullptr )
    {
       p_routine                    = x->p_routine;
+      p_nonInteractive             = x->p_nonInteractive;
       p_fileCache                  = x->p_fileCache;
       p_subframes                  = x->p_subframes;
       p_subframeScale              = x->p_subframeScale;
@@ -213,11 +215,13 @@ public:
    SubframeSelectorMeasureThread( int index,
                                   ImageVariant* subframe,
                                   const String& subframePath,
-                                  MeasureThreadInputData* data )
+                                  MeasureThreadInputData* data,
+                                  bool throwsOnMeasurementError = true )
       : m_index( index )
       , m_subframe( subframe )
       , m_outputData( subframePath )
       , m_data( data )
+      , m_throwsOnMeasurementError( throwsOnMeasurementError )
    {
    }
 
@@ -250,7 +254,8 @@ public:
          // Run the Star Detector
          star_list stars = StarDetector();
          if ( stars.IsEmpty() )
-            throw Error( "No stars detected" );
+            if ( m_throwsOnMeasurementError )
+               throw Error( "No stars detected" );
 
          // Stop if just showing the maps
          if ( m_data->showStarDetectionMaps )
@@ -265,7 +270,8 @@ public:
          // Run the PSF Fitter
          psf_list fits = FitPSFs( stars.Begin(), stars.End() );
          if ( fits.IsEmpty() )
-            throw Error( "No PSF could be fitted" );
+            if ( m_throwsOnMeasurementError )
+               throw Error( "No PSF could be fitted" );
 
          if ( IsAborted() )
             throw Error( "Aborted" );
@@ -325,6 +331,7 @@ private:
    bool                      m_success = false;
    String                    m_errorInfo;
    MeasureThreadInputData*   m_data = nullptr;
+   bool                      m_throwsOnMeasurementError = true;
 
    void EvaluateNoise()
    {
@@ -691,6 +698,13 @@ bool SubframeSelectorInstance::CanMeasure( String &whyNot ) const
 bool SubframeSelectorInstance::Measure()
 {
    /*
+    * For all errors generated, we want a report on the console. This is
+    * customary in PixInsight for all batch processes.
+    */
+   Exception::EnableConsoleOutput();
+   Exception::DisableGUIOutput();
+
+   /*
     * Start with a general validation of working parameters.
     */
    {
@@ -744,13 +758,6 @@ bool SubframeSelectorInstance::Measure()
          ERROR_HANDLER;
       }
    }
-
-   /*
-    * For all errors generated, we want a report on the console. This is
-    * customary in PixInsight for all batch processes.
-    */
-   Exception::EnableConsoleOutput();
-   Exception::DisableGUIOutput();
 
    console.EnableAbort();
    Module->ProcessEvents();
@@ -878,7 +885,8 @@ bool SubframeSelectorInstance::Measure()
                      *i = new SubframeSelectorMeasureThread( pendingItemsTotal-pendingItems.Length()+1,
                                                              LoadSubframe( item.path ),
                                                              item.path,
-                                                             &inputThreadData );
+                                                             &inputThreadData,
+                                                             !p_nonInteractive/*throwsOnMeasurementError*/ );
                      (*i)->Start( ThreadPriority::DefaultMax );
                      ++running;
                   }
@@ -948,13 +956,16 @@ bool SubframeSelectorInstance::Measure()
 
    p_measures.Sort( SubframeSortingBinaryPredicate( SSSortingProperty::Index, 0 ) );
 
-   if ( TheSubframeSelectorMeasurementsInterface != nullptr )
-      TheSubframeSelectorMeasurementsInterface->SetMeasurements( p_measures );
-
-   if ( TheSubframeSelectorInterface != nullptr )
+   if ( !p_nonInteractive )
    {
-      TheSubframeSelectorInterface->ShowExpressionsInterface();
-      TheSubframeSelectorInterface->ShowMeasurementsInterface();
+      if ( TheSubframeSelectorMeasurementsInterface != nullptr )
+         TheSubframeSelectorMeasurementsInterface->SetMeasurements( p_measures );
+
+      if ( TheSubframeSelectorInterface != nullptr )
+      {
+         TheSubframeSelectorInterface->ShowExpressionsInterface();
+         TheSubframeSelectorInterface->ShowMeasurementsInterface();
+      }
    }
 
    return true;
@@ -1460,6 +1471,8 @@ void* SubframeSelectorInstance::LockParameter( const MetaParameter* p, size_type
 {
    if ( p == TheSSRoutineParameter )
       return &p_routine;
+   else if ( p == TheSSNonInteractiveParameter )
+      return &p_nonInteractive;
 
    else if ( p == TheSSSubframeEnabledParameter )
       return &p_subframes[tableRow].enabled;
@@ -1721,4 +1734,4 @@ size_type SubframeSelectorInstance::ParameterLength( const MetaParameter* p, siz
 } // pcl
 
 // ----------------------------------------------------------------------------
-// EOF SubframeSelectorInstance.cpp - Released 2020-12-17T15:46:56Z
+// EOF SubframeSelectorInstance.cpp - Released 2021-04-09T19:41:49Z

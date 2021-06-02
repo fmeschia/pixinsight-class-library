@@ -2,11 +2,11 @@
 //    / __ \ / ____// /
 //   / /_/ // /    / /
 //  / ____// /___ / /___   PixInsight Class Library
-// /_/     \____//_____/   PCL 2.4.7
+// /_/     \____//_____/   PCL 2.4.9
 // ----------------------------------------------------------------------------
-// Standard PixelMath Process Module Version 1.8.0
+// Standard PixelMath Process Module Version 1.8.1
 // ----------------------------------------------------------------------------
-// PixelMathParameters.h - Released 2021-01-23T18:24:14Z
+// PixelMathParameters.h - Released 2021-05-05T15:38:07Z
 // ----------------------------------------------------------------------------
 // This file is part of the standard PixelMath PixInsight module.
 //
@@ -536,4 +536,4 @@ PCL_END_LOCAL
 #endif   // __PixelMathParameters_h
 
 // ----------------------------------------------------------------------------
-// EOF PixelMathParameters.h - Released 2021-01-23T18:24:14Z
+// EOF PixelMathParameters.h - Released 2021-05-05T15:38:07Z

@@ -2,15 +2,15 @@
 //    / __ \ / ____// /
 //   / /_/ // /    / /
 //  / ____// /___ / /___   PixInsight Class Library
-// /_/     \____//_____/   PCL 2.4.7
+// /_/     \____//_____/   PCL 2.4.9
 // ----------------------------------------------------------------------------
 // Standard Debayer Process Module Version 1.8.2
 // ----------------------------------------------------------------------------
-// DebayerParameters.cpp - Released 2020-12-17T15:46:56Z
+// DebayerParameters.cpp - Released 2021-04-09T19:41:49Z
 // ----------------------------------------------------------------------------
 // This file is part of the standard Debayer PixInsight module.
 //
-// Copyright (c) 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+// Copyright (c) 2003-2021 Pleiades Astrophoto S.L. All Rights Reserved.
 //
 // Redistribution and use in both source and binary forms, with or without
 // modification, is permitted provided that the following conditions are met:
@@ -67,6 +67,7 @@ DebayerCFASourceFilePath*         TheDebayerCFASourceFilePathParameter = nullptr
 DebayerTargetItems*               TheDebayerTargetItemsParameter = nullptr;
 DebayerTargetEnabled*             TheDebayerTargetEnabledParameter = nullptr;
 DebayerTargetImage*               TheDebayerTargetImageParameter = nullptr;
+DebayerAutoMemoryLimit*           TheDebayerAutoMemoryLimitParameter = nullptr;
 DebayerNoGUIMessages*             TheDebayerNoGUIMessagesParameter = nullptr;
 DebayerInputHints*                TheDebayerInputHintsParameter = nullptr;
 DebayerOutputHints*               TheDebayerOutputHintsParameter = nullptr;
@@ -346,6 +347,23 @@ DebayerTargetImage::DebayerTargetImage( MetaTable* T ) : MetaString( T )
 IsoString DebayerTargetImage::Id() const
 {
    return "image";
+}
+
+// ----------------------------------------------------------------------------
+
+DebayerAutoMemoryLimit::DebayerAutoMemoryLimit( MetaProcess* P ) : MetaBoolean( P )
+{
+   TheDebayerAutoMemoryLimitParameter = this;
+}
+
+IsoString DebayerAutoMemoryLimit::Id() const
+{
+   return "autoMemoryLimit";
+}
+
+bool DebayerAutoMemoryLimit::DefaultValue() const
+{
+   return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -1082,4 +1100,4 @@ bool DebayerOutputFileNoiseAlgorithmB::IsReadOnly() const
 } // pcl
 
 // ----------------------------------------------------------------------------
-// EOF DebayerParameters.cpp - Released 2020-12-17T15:46:56Z
+// EOF DebayerParameters.cpp - Released 2021-04-09T19:41:49Z
